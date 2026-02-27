@@ -12,12 +12,40 @@ export default function App() {
     const saved = localStorage.getItem('ds_selected_id');
     return (saved as DataStructureType) || 'Array';
   });
-  const [sqlSchema, setSqlSchema] = useState<string>('');
+  const [sqlSchema, setSqlSchema] = useState<string>(() => {
+    return localStorage.getItem('ds_current_sql') || '';
+  });
+  const [savedSchemas, setSavedSchemas] = useState<{id: string, name: string, sql: string}[]>(() => {
+    const saved = localStorage.getItem('ds_saved_schemas');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [isGenerating, setIsGenerating] = useState(false);
 
   React.useEffect(() => {
     localStorage.setItem('ds_selected_id', selectedId);
   }, [selectedId]);
+
+  React.useEffect(() => {
+    localStorage.setItem('ds_current_sql', sqlSchema);
+  }, [sqlSchema]);
+
+  React.useEffect(() => {
+    localStorage.setItem('ds_saved_schemas', JSON.stringify(savedSchemas));
+  }, [savedSchemas]);
+
+  const saveCurrentSchema = () => {
+    if (!sqlSchema) return;
+    const newSchema = {
+      id: Date.now().toString(),
+      name: `${selectedId} Schema (${new Date().toLocaleTimeString()})`,
+      sql: sqlSchema
+    };
+    setSavedSchemas([newSchema, ...savedSchemas]);
+  };
+
+  const deleteSchema = (id: string) => {
+    setSavedSchemas(savedSchemas.filter(s => s.id !== id));
+  };
 
   const selectedData = DATA_STRUCTURES.find(ds => ds.id === selectedId)!;
 
@@ -210,14 +238,25 @@ export default function App() {
                     <p className="text-xs opacity-60 font-mono uppercase tracking-wider">AI-Powered Database Schema</p>
                   </div>
                 </div>
-                <button 
-                  onClick={generateSQL}
-                  disabled={isGenerating}
-                  className="px-6 py-2 bg-white text-ink font-bold rounded-lg hover:bg-white/90 transition-colors flex items-center gap-2 disabled:opacity-50"
-                >
-                  {isGenerating ? <Loader2 className="animate-spin" size={18} /> : <Code size={18} />}
-                  {isGenerating ? 'Generating...' : 'Generate SQL'}
-                </button>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={generateSQL}
+                    disabled={isGenerating}
+                    className="px-6 py-2 bg-white text-ink font-bold rounded-lg hover:bg-white/90 transition-colors flex items-center gap-2 disabled:opacity-50"
+                  >
+                    {isGenerating ? <Loader2 className="animate-spin" size={18} /> : <Code size={18} />}
+                    {isGenerating ? 'Generating...' : 'Generate SQL'}
+                  </button>
+                  {sqlSchema && (
+                    <button 
+                      onClick={saveCurrentSchema}
+                      className="p-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
+                      title="Save to History"
+                    >
+                      <Plus size={20} />
+                    </button>
+                  )}
+                </div>
               </div>
 
               <AnimatePresence mode="wait">
@@ -225,11 +264,13 @@ export default function App() {
                   <motion.div 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-6 bg-white/5 rounded-xl border border-white/10 font-mono text-sm overflow-x-auto"
+                    className="space-y-4"
                   >
-                    <pre className="whitespace-pre-wrap text-emerald-400">
-                      {sqlSchema}
-                    </pre>
+                    <div className="p-6 bg-white/5 rounded-xl border border-white/10 font-mono text-sm overflow-x-auto">
+                      <pre className="whitespace-pre-wrap text-emerald-400">
+                        {sqlSchema}
+                      </pre>
+                    </div>
                   </motion.div>
                 ) : (
                   <div className="p-12 border-2 border-dashed border-white/10 rounded-xl flex flex-center justify-center text-center opacity-40 italic">
@@ -237,6 +278,33 @@ export default function App() {
                   </div>
                 )}
               </AnimatePresence>
+
+              {savedSchemas.length > 0 && (
+                <div className="pt-6 border-t border-white/10">
+                  <h4 className="text-xs font-mono uppercase tracking-widest opacity-50 mb-4">Saved History</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {savedSchemas.map(schema => (
+                      <div key={schema.id} className="p-4 bg-white/5 rounded-lg border border-white/10 flex justify-between items-center group">
+                        <div className="overflow-hidden">
+                          <p className="text-sm font-bold truncate">{schema.name}</p>
+                          <button 
+                            onClick={() => setSqlSchema(schema.sql)}
+                            className="text-[10px] text-emerald-400 hover:underline"
+                          >
+                            Load SQL
+                          </button>
+                        </div>
+                        <button 
+                          onClick={() => deleteSchema(schema.id)}
+                          className="text-white/20 hover:text-red-400 transition-colors"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </section>
 
