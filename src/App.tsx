@@ -2,12 +2,35 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { DATA_STRUCTURES, DataStructureType } from './types';
 import { VisualizerMap, IconMap } from './components/Visualizers';
-import { ChevronRight, Info, Clock, Search, Plus, Trash2, Cpu } from 'lucide-react';
+import { ChevronRight, Info, Clock, Search, Plus, Trash2, Cpu, Database as DbIcon, Code, Sparkles, Loader2 } from 'lucide-react';
+import { GoogleGenAI } from "@google/genai";
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
 export default function App() {
   const [selectedId, setSelectedId] = useState<DataStructureType>('Array');
+  const [sqlSchema, setSqlSchema] = useState<string>('');
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const selectedData = DATA_STRUCTURES.find(ds => ds.id === selectedId)!;
+
+  const generateSQL = async () => {
+    setIsGenerating(true);
+    try {
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: `Generate a MariaDB SQL 'CREATE TABLE' statement to represent a ${selectedId} data structure. 
+        Explain briefly how the table structure maps to the data structure. 
+        Return only the SQL and a short explanation in Markdown format.`,
+      });
+      setSqlSchema(response.text || 'Failed to generate SQL');
+    } catch (error) {
+      console.error("Error generating SQL:", error);
+      setSqlSchema("Error generating SQL. Please check your API key.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -29,6 +52,7 @@ export default function App() {
             <span>Linear</span>
             <span>Non-Linear</span>
             <span>Complexity</span>
+            <span>Database</span>
           </div>
         </div>
       </header>
@@ -43,7 +67,10 @@ export default function App() {
               {DATA_STRUCTURES.filter(ds => ds.category === 'Linear').map(ds => (
                 <button
                   key={ds.id}
-                  onClick={() => setSelectedId(ds.id)}
+                  onClick={() => {
+                    setSelectedId(ds.id);
+                    setSqlSchema('');
+                  }}
                   className={`w-full flex items-center justify-between p-3 rounded-lg transition-all group ${
                     selectedId === ds.id 
                     ? 'bg-ink text-white shadow-lg' 
@@ -68,7 +95,10 @@ export default function App() {
               {DATA_STRUCTURES.filter(ds => ds.category === 'Non-Linear').map(ds => (
                 <button
                   key={ds.id}
-                  onClick={() => setSelectedId(ds.id)}
+                  onClick={() => {
+                    setSelectedId(ds.id);
+                    setSqlSchema('');
+                  }}
                   className={`w-full flex items-center justify-between p-3 rounded-lg transition-all group ${
                     selectedId === ds.id 
                     ? 'bg-ink text-white shadow-lg' 
@@ -152,6 +182,53 @@ export default function App() {
                 >
                   {VisualizerMap[selectedId]}
                 </motion.div>
+              </AnimatePresence>
+            </div>
+          </section>
+
+          {/* AI SQL Generation Section */}
+          <section className="bg-ink text-white rounded-2xl p-8 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+              <DbIcon size={120} />
+            </div>
+            
+            <div className="relative z-10 space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white/10 rounded-lg">
+                    <Sparkles className="text-yellow-400" size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold">MariaDB SQL Generator</h3>
+                    <p className="text-xs opacity-60 font-mono uppercase tracking-wider">AI-Powered Database Schema</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={generateSQL}
+                  disabled={isGenerating}
+                  className="px-6 py-2 bg-white text-ink font-bold rounded-lg hover:bg-white/90 transition-colors flex items-center gap-2 disabled:opacity-50"
+                >
+                  {isGenerating ? <Loader2 className="animate-spin" size={18} /> : <Code size={18} />}
+                  {isGenerating ? 'Generating...' : 'Generate SQL'}
+                </button>
+              </div>
+
+              <AnimatePresence mode="wait">
+                {sqlSchema ? (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-6 bg-white/5 rounded-xl border border-white/10 font-mono text-sm overflow-x-auto"
+                  >
+                    <pre className="whitespace-pre-wrap text-emerald-400">
+                      {sqlSchema}
+                    </pre>
+                  </motion.div>
+                ) : (
+                  <div className="p-12 border-2 border-dashed border-white/10 rounded-xl flex flex-center justify-center text-center opacity-40 italic">
+                    Click "Generate SQL" to see how to represent this {selectedId} in MariaDB.
+                  </div>
+                )}
               </AnimatePresence>
             </div>
           </section>
