@@ -20,17 +20,30 @@ export default function App() {
     return saved ? JSON.parse(saved) : [];
   });
   const [isGenerating, setIsGenerating] = useState(false);
+  const [lastSaved, setLastSaved] = useState<string>(() => new Date().toLocaleTimeString());
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('saved');
+
+  const triggerSave = () => {
+    setSaveStatus('saving');
+    setTimeout(() => {
+      setLastSaved(new Date().toLocaleTimeString());
+      setSaveStatus('saved');
+    }, 500);
+  };
 
   React.useEffect(() => {
     localStorage.setItem('ds_selected_id', selectedId);
+    triggerSave();
   }, [selectedId]);
 
   React.useEffect(() => {
     localStorage.setItem('ds_current_sql', sqlSchema);
+    if (sqlSchema) triggerSave();
   }, [sqlSchema]);
 
   React.useEffect(() => {
     localStorage.setItem('ds_saved_schemas', JSON.stringify(savedSchemas));
+    triggerSave();
   }, [savedSchemas]);
 
   const saveCurrentSchema = () => {
@@ -46,6 +59,12 @@ export default function App() {
   const deleteSchema = (id: string) => {
     setSavedSchemas(savedSchemas.filter(s => s.id !== id));
   };
+
+  React.useEffect(() => {
+    const handleDataSaved = () => triggerSave();
+    window.addEventListener('ds-data-saved', handleDataSaved);
+    return () => window.removeEventListener('ds-data-saved', handleDataSaved);
+  }, []);
 
   const selectedData = DATA_STRUCTURES.find(ds => ds.id === selectedId)!;
 
@@ -83,11 +102,19 @@ export default function App() {
               <p className="text-[10px] uppercase tracking-widest opacity-50 font-mono">Educational Tool v1.0</p>
             </div>
           </div>
-          <div className="hidden md:flex gap-6 text-xs font-mono uppercase tracking-wider opacity-60">
-            <span>Linear</span>
-            <span>Non-Linear</span>
-            <span>Complexity</span>
-            <span>Database</span>
+          <div className="flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-emerald-50 border border-emerald-100 rounded-full">
+              <div className={`w-1.5 h-1.5 rounded-full ${saveStatus === 'saving' ? 'bg-yellow-400 animate-pulse' : 'bg-emerald-500'}`} />
+              <span className="text-[10px] font-mono font-bold text-emerald-700 uppercase tracking-tight">
+                {saveStatus === 'saving' ? 'Saving...' : `Auto-Saved: ${lastSaved}`}
+              </span>
+            </div>
+            <div className="hidden md:flex gap-6 text-xs font-mono uppercase tracking-wider opacity-60">
+              <span>Linear</span>
+              <span>Non-Linear</span>
+              <span>Complexity</span>
+              <span>Database</span>
+            </div>
           </div>
         </div>
       </header>

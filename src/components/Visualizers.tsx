@@ -12,6 +12,7 @@ export const ArrayVisualizer = () => {
 
   useEffect(() => {
     localStorage.setItem('ds_array_data', JSON.stringify(items));
+    window.dispatchEvent(new CustomEvent('ds-data-saved'));
   }, [items]);
   
   const addItem = () => setItems([...items, Math.floor(Math.random() * 100)]);
@@ -65,6 +66,7 @@ export const StackVisualizer = () => {
 
   useEffect(() => {
     localStorage.setItem('ds_stack_data', JSON.stringify(items));
+    window.dispatchEvent(new CustomEvent('ds-data-saved'));
   }, [items]);
   
   const push = () => setItems([...items, Math.floor(Math.random() * 100)]);
@@ -108,6 +110,7 @@ export const QueueVisualizer = () => {
 
   useEffect(() => {
     localStorage.setItem('ds_queue_data', JSON.stringify(items));
+    window.dispatchEvent(new CustomEvent('ds-data-saved'));
   }, [items]);
   
   const enqueue = () => setItems([...items, Math.floor(Math.random() * 100)]);
@@ -152,6 +155,7 @@ export const LinkedListVisualizer = () => {
 
   useEffect(() => {
     localStorage.setItem('ds_linkedlist_data', JSON.stringify(items));
+    window.dispatchEvent(new CustomEvent('ds-data-saved'));
   }, [items]);
   
   const addNode = () => setItems([...items, Math.floor(Math.random() * 100)]);
@@ -208,6 +212,7 @@ export const TreeVisualizer = () => {
 
   useEffect(() => {
     localStorage.setItem('ds_tree_data', JSON.stringify(nodes));
+    window.dispatchEvent(new CustomEvent('ds-data-saved'));
   }, [nodes]);
 
   const addNode = () => {
@@ -299,6 +304,7 @@ export const GraphVisualizer = () => {
 
   useEffect(() => {
     localStorage.setItem('ds_graph_data', JSON.stringify(nodes));
+    window.dispatchEvent(new CustomEvent('ds-data-saved'));
   }, [nodes]);
 
   const addNode = () => {
