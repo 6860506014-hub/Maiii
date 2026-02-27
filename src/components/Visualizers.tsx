@@ -5,7 +5,14 @@ import { DataStructureType } from '../types';
 
 // --- Array Visualizer ---
 export const ArrayVisualizer = () => {
-  const [items, setItems] = useState([10, 20, 30, 40, 50]);
+  const [items, setItems] = useState<number[]>(() => {
+    const saved = localStorage.getItem('ds_array_data');
+    return saved ? JSON.parse(saved) : [10, 20, 30, 40, 50];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('ds_array_data', JSON.stringify(items));
+  }, [items]);
   
   const addItem = () => setItems([...items, Math.floor(Math.random() * 100)]);
   const removeItem = (index: number) => setItems(items.filter((_, i) => i !== index));
@@ -51,7 +58,14 @@ export const ArrayVisualizer = () => {
 
 // --- Stack Visualizer ---
 export const StackVisualizer = () => {
-  const [items, setItems] = useState([10, 20, 30]);
+  const [items, setItems] = useState<number[]>(() => {
+    const saved = localStorage.getItem('ds_stack_data');
+    return saved ? JSON.parse(saved) : [10, 20, 30];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('ds_stack_data', JSON.stringify(items));
+  }, [items]);
   
   const push = () => setItems([...items, Math.floor(Math.random() * 100)]);
   const pop = () => setItems(items.slice(0, -1));
@@ -87,7 +101,14 @@ export const StackVisualizer = () => {
 
 // --- Queue Visualizer ---
 export const QueueVisualizer = () => {
-  const [items, setItems] = useState([10, 20, 30]);
+  const [items, setItems] = useState<number[]>(() => {
+    const saved = localStorage.getItem('ds_queue_data');
+    return saved ? JSON.parse(saved) : [10, 20, 30];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('ds_queue_data', JSON.stringify(items));
+  }, [items]);
   
   const enqueue = () => setItems([...items, Math.floor(Math.random() * 100)]);
   const dequeue = () => setItems(items.slice(1));
@@ -124,7 +145,14 @@ export const QueueVisualizer = () => {
 
 // --- Linked List Visualizer ---
 export const LinkedListVisualizer = () => {
-  const [items, setItems] = useState([10, 20, 30]);
+  const [items, setItems] = useState<number[]>(() => {
+    const saved = localStorage.getItem('ds_linkedlist_data');
+    return saved ? JSON.parse(saved) : [10, 20, 30];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('ds_linkedlist_data', JSON.stringify(items));
+  }, [items]);
   
   const addNode = () => setItems([...items, Math.floor(Math.random() * 100)]);
   const removeNode = () => setItems(items.slice(0, -1));

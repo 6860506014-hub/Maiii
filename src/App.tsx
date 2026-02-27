@@ -8,9 +8,16 @@ import { GoogleGenAI } from "@google/genai";
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
 export default function App() {
-  const [selectedId, setSelectedId] = useState<DataStructureType>('Array');
+  const [selectedId, setSelectedId] = useState<DataStructureType>(() => {
+    const saved = localStorage.getItem('ds_selected_id');
+    return (saved as DataStructureType) || 'Array';
+  });
   const [sqlSchema, setSqlSchema] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
+
+  React.useEffect(() => {
+    localStorage.setItem('ds_selected_id', selectedId);
+  }, [selectedId]);
 
   const selectedData = DATA_STRUCTURES.find(ds => ds.id === selectedId)!;
 
