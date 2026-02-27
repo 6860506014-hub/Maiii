@@ -201,98 +201,161 @@ export const LinkedListVisualizer = () => {
 
 // --- Tree Visualizer (Simple Binary Tree) ---
 export const TreeVisualizer = () => {
+  const [nodes, setNodes] = useState<number[]>(() => {
+    const saved = localStorage.getItem('ds_tree_data');
+    return saved ? JSON.parse(saved) : [1, 2, 3, 4, 5, 6, 7];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('ds_tree_data', JSON.stringify(nodes));
+  }, [nodes]);
+
+  const addNode = () => {
+    if (nodes.length < 15) {
+      setNodes([...nodes, nodes.length + 1]);
+    }
+  };
+
+  const resetTree = () => setNodes([1]);
+
   return (
     <div className="flex flex-col items-center p-4 w-full">
       <div className="relative w-full max-w-lg h-[300px] flex flex-col items-center">
         {/* Root */}
-        <div className="relative">
-          <motion.div 
-            initial={{ scale: 0 }} animate={{ scale: 1 }}
-            className="w-14 h-14 rounded-full border-2 border-ink bg-white flex items-center justify-center font-mono text-xl shadow-[4px_4px_0px_0px_rgba(20,20,20,1)] z-20"
-          >
-            1
-          </motion.div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-[200px] h-[100px] pointer-events-none">
-             <svg className="w-full h-full overflow-visible">
-                <line x1="50%" y1="50%" x2="25%" y2="100%" stroke="currentColor" strokeWidth="2" />
-                <line x1="50%" y1="50%" x2="75%" y2="100%" stroke="currentColor" strokeWidth="2" />
-             </svg>
+        {nodes.length > 0 && (
+          <div className="relative">
+            <motion.div 
+              initial={{ scale: 0 }} animate={{ scale: 1 }}
+              className="w-14 h-14 rounded-full border-2 border-ink bg-white flex items-center justify-center font-mono text-xl shadow-[4px_4px_0px_0px_rgba(20,20,20,1)] z-20"
+            >
+              {nodes[0]}
+            </motion.div>
+            {nodes.length > 1 && (
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-[200px] h-[100px] pointer-events-none">
+                 <svg className="w-full h-full overflow-visible">
+                    {nodes.length > 1 && <line x1="50%" y1="50%" x2="25%" y2="100%" stroke="currentColor" strokeWidth="2" />}
+                    {nodes.length > 2 && <line x1="50%" y1="50%" x2="75%" y2="100%" stroke="currentColor" strokeWidth="2" />}
+                 </svg>
+              </div>
+            )}
           </div>
-        </div>
+        )}
         
         <div className="flex justify-between w-full mt-16 px-12">
           {/* Level 1 */}
-          <div className="relative">
-            <motion.div 
-              initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.1 }}
-              className="w-12 h-12 rounded-full border-2 border-ink bg-white flex items-center justify-center font-mono shadow-[3px_3px_0px_0px_rgba(20,20,20,1)] z-20"
-            >
-              2
-            </motion.div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-[100px] h-[80px] pointer-events-none">
-               <svg className="w-full h-full overflow-visible">
-                  <line x1="50%" y1="50%" x2="20%" y2="100%" stroke="currentColor" strokeWidth="2" />
-                  <line x1="50%" y1="50%" x2="80%" y2="100%" stroke="currentColor" strokeWidth="2" />
-               </svg>
+          {nodes.slice(1, 3).map((val, i) => (
+            <div key={i} className="relative">
+              <motion.div 
+                initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.1 }}
+                className="w-12 h-12 rounded-full border-2 border-ink bg-white flex items-center justify-center font-mono shadow-[3px_3px_0px_0px_rgba(20,20,20,1)] z-20"
+              >
+                {val}
+              </motion.div>
+              {nodes.length > (i === 0 ? 3 : 5) && (
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-[100px] h-[80px] pointer-events-none">
+                   <svg className="w-full h-full overflow-visible">
+                      {nodes.length > (i === 0 ? 3 : 5) && <line x1="50%" y1="50%" x2="20%" y2="100%" stroke="currentColor" strokeWidth="2" />}
+                      {nodes.length > (i === 0 ? 4 : 6) && <line x1="50%" y1="50%" x2="80%" y2="100%" stroke="currentColor" strokeWidth="2" />}
+                   </svg>
+                </div>
+              )}
             </div>
-          </div>
-
-          <div className="relative">
-            <motion.div 
-              initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2 }}
-              className="w-12 h-12 rounded-full border-2 border-ink bg-white flex items-center justify-center font-mono shadow-[3px_3px_0px_0px_rgba(20,20,20,1)] z-20"
-            >
-              3
-            </motion.div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-[100px] h-[80px] pointer-events-none">
-               <svg className="w-full h-full overflow-visible">
-                  <line x1="50%" y1="50%" x2="20%" y2="100%" stroke="currentColor" strokeWidth="2" />
-                  <line x1="50%" y1="50%" x2="80%" y2="100%" stroke="currentColor" strokeWidth="2" />
-               </svg>
-            </div>
-          </div>
+          ))}
         </div>
 
         <div className="flex justify-between w-full mt-12">
           {/* Level 2 */}
           <div className="flex gap-4">
-            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.3 }} className="w-10 h-10 rounded-full border-2 border-ink bg-white flex items-center justify-center font-mono text-sm shadow-[2px_2px_0px_0px_rgba(20,20,20,1)]">4</motion.div>
-            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.4 }} className="w-10 h-10 rounded-full border-2 border-ink bg-white flex items-center justify-center font-mono text-sm shadow-[2px_2px_0px_0px_rgba(20,20,20,1)]">5</motion.div>
+            {nodes.slice(3, 5).map((val, i) => (
+              <motion.div key={i} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.3 + i*0.1 }} className="w-10 h-10 rounded-full border-2 border-ink bg-white flex items-center justify-center font-mono text-sm shadow-[2px_2px_0px_0px_rgba(20,20,20,1)]">
+                {val}
+              </motion.div>
+            ))}
           </div>
           <div className="flex gap-4">
-            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.5 }} className="w-10 h-10 rounded-full border-2 border-ink bg-white flex items-center justify-center font-mono text-sm shadow-[2px_2px_0px_0px_rgba(20,20,20,1)]">6</motion.div>
-            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.6 }} className="w-10 h-10 rounded-full border-2 border-ink bg-white flex items-center justify-center font-mono text-sm shadow-[2px_2px_0px_0px_rgba(20,20,20,1)]">7</motion.div>
+            {nodes.slice(5, 7).map((val, i) => (
+              <motion.div key={i} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.5 + i*0.1 }} className="w-10 h-10 rounded-full border-2 border-ink bg-white flex items-center justify-center font-mono text-sm shadow-[2px_2px_0px_0px_rgba(20,20,20,1)]">
+                {val}
+              </motion.div>
+            ))}
           </div>
         </div>
       </div>
-      <p className="mt-8 text-xs font-mono opacity-50 italic">Hierarchical representation (Binary Tree)</p>
+      <div className="flex gap-2 mt-8">
+        <button onClick={addNode} className="px-4 py-2 border-2 border-ink bg-white hover:bg-ink hover:text-white font-mono text-sm transition-colors">ADD NODE</button>
+        <button onClick={resetTree} className="px-4 py-2 border-2 border-ink bg-white hover:bg-ink hover:text-white font-mono text-sm transition-colors">RESET</button>
+      </div>
+      <p className="mt-4 text-xs font-mono opacity-50 italic">Hierarchical representation (Binary Tree)</p>
     </div>
   );
 };
 
 // --- Graph Visualizer ---
 export const GraphVisualizer = () => {
+  const [nodes, setNodes] = useState<string[]>(() => {
+    const saved = localStorage.getItem('ds_graph_data');
+    return saved ? JSON.parse(saved) : ['A', 'B', 'C', 'D', 'E'];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('ds_graph_data', JSON.stringify(nodes));
+  }, [nodes]);
+
+  const addNode = () => {
+    if (nodes.length < 8) {
+      const nextChar = String.fromCharCode(65 + nodes.length);
+      setNodes([...nodes, nextChar]);
+    }
+  };
+
+  const resetGraph = () => setNodes(['A']);
+
   return (
     <div className="flex flex-col items-center p-4">
       <div className="relative w-72 h-72 border border-dashed border-ink/10 rounded-full flex items-center justify-center">
-        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full border-2 border-ink bg-white flex items-center justify-center font-mono text-lg shadow-[3px_3px_0px_0px_rgba(20,20,20,1)] z-10">A</motion.div>
-        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.1 }} className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-12 rounded-full border-2 border-ink bg-white flex items-center justify-center font-mono text-lg shadow-[3px_3px_0px_0px_rgba(20,20,20,1)] z-10">B</motion.div>
-        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2 }} className="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full border-2 border-ink bg-white flex items-center justify-center font-mono text-lg shadow-[3px_3px_0px_0px_rgba(20,20,20,1)] z-10">C</motion.div>
-        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.3 }} className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full border-2 border-ink bg-white flex items-center justify-center font-mono text-lg shadow-[3px_3px_0px_0px_rgba(20,20,20,1)] z-10">D</motion.div>
-        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.4 }} className="absolute top-1/4 left-1/4 w-10 h-10 rounded-full border-2 border-ink bg-white flex items-center justify-center font-mono shadow-[2px_2px_0px_0px_rgba(20,20,20,1)] z-10">E</motion.div>
+        {nodes.map((node, i) => {
+          const angle = (i / nodes.length) * 2 * Math.PI;
+          const x = Math.cos(angle) * 120;
+          const y = Math.sin(angle) * 120;
+          
+          return (
+            <motion.div 
+              key={node}
+              initial={{ scale: 0 }} 
+              animate={{ scale: 1, x, y }} 
+              className="absolute w-12 h-12 rounded-full border-2 border-ink bg-white flex items-center justify-center font-mono text-lg shadow-[3px_3px_0px_0px_rgba(20,20,20,1)] z-10"
+            >
+              {node}
+            </motion.div>
+          );
+        })}
         
         {/* Connections */}
         <svg className="absolute inset-0 w-full h-full -z-10 overflow-visible opacity-40">
-          <line x1="50%" y1="0" x2="50%" y2="100%" stroke="currentColor" strokeWidth="2" />
-          <line x1="0" y1="50%" x2="100%" y2="50%" stroke="currentColor" strokeWidth="2" />
-          <line x1="50%" y1="0" x2="100%" y2="50%" stroke="currentColor" strokeWidth="2" />
-          <line x1="0" y1="50%" x2="50%" y2="100%" stroke="currentColor" strokeWidth="2" />
-          <line x1="25%" y1="25%" x2="50%" y2="0" stroke="currentColor" strokeWidth="2" />
-          <line x1="25%" y1="25%" x2="0" y2="50%" stroke="currentColor" strokeWidth="2" />
-          <line x1="25%" y1="25%" x2="50%" y2="100%" stroke="currentColor" strokeWidth="2" />
+          {nodes.map((_, i) => {
+            const angle1 = (i / nodes.length) * 2 * Math.PI;
+            const x1 = 144 + Math.cos(angle1) * 120;
+            const y1 = 144 + Math.sin(angle1) * 120;
+            
+            return nodes.slice(i + 1).map((__, j) => {
+              const angle2 = ((i + j + 1) / nodes.length) * 2 * Math.PI;
+              const x2 = 144 + Math.cos(angle2) * 120;
+              const y2 = 144 + Math.sin(angle2) * 120;
+              
+              // Only draw some connections to keep it clean
+              if ((i + j) % 2 === 0) {
+                return <line key={`${i}-${j}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke="currentColor" strokeWidth="1" />;
+              }
+              return null;
+            });
+          })}
         </svg>
       </div>
-      <p className="mt-8 text-xs font-mono opacity-50 italic">Network representation (Non-Linear Graph)</p>
+      <div className="flex gap-2 mt-8">
+        <button onClick={addNode} className="px-4 py-2 border-2 border-ink bg-white hover:bg-ink hover:text-white font-mono text-sm transition-colors">ADD NODE</button>
+        <button onClick={resetGraph} className="px-4 py-2 border-2 border-ink bg-white hover:bg-ink hover:text-white font-mono text-sm transition-colors">RESET</button>
+      </div>
+      <p className="mt-4 text-xs font-mono opacity-50 italic">Network representation (Non-Linear Graph)</p>
     </div>
   );
 };
