@@ -1,0 +1,5 @@
+{
+  "name": "Data Structure Visualizer",
+  "description": "An interactive educational tool for learning linear and non-linear data structures like Arrays, Stacks, Queues, Linked Lists, Trees, and Graphs.",
+  "requestFramePermissions": []
+}
